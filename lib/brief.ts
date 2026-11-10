@@ -56,6 +56,79 @@ Hard rules:
 - Tag IPO timing and valuation targets as speculation, not fact.
 - Return JSON only matching the schema.`;
 
+/** Constrains Gemini JSON mode to the brief shape and the real source ids. */
+export function briefResponseSchema(sourceIds: string[]) {
+  const sourceId = { type: "string", enum: sourceIds };
+  return {
+    type: "object",
+    properties: {
+      what_happened: { type: "string" },
+      per_source: {
+        type: "array",
+        minItems: 1,
+        items: {
+          type: "object",
+          properties: {
+            source_id: sourceId,
+            summary: { type: "string" },
+            why_it_matters: { type: "string" },
+            who_should_care: { type: "array", minItems: 1, maxItems: 4, items: { type: "string" } },
+          },
+          required: ["source_id", "summary", "why_it_matters", "who_should_care"],
+        },
+      },
+      claims: {
+        type: "array",
+        minItems: 1,
+        maxItems: MAX_BRIEF_CLAIMS,
+        items: {
+          type: "object",
+          properties: {
+            text: { type: "string" },
+            type: { type: "string", enum: ["fact", "analysis", "speculation"] },
+            source_id: sourceId,
+            supporting_quote: { type: "string" },
+          },
+          required: ["text", "type", "source_id", "supporting_quote"],
+        },
+      },
+      story_angles: {
+        type: "array",
+        minItems: MIN_STORY_ANGLES,
+        maxItems: MAX_STORY_ANGLES,
+        items: {
+          type: "object",
+          properties: {
+            headline: { type: "string" },
+            rationale: { type: "string" },
+          },
+          required: ["headline", "rationale"],
+        },
+      },
+      recommended_angle: { type: "string" },
+      reasoning: { type: "string" },
+      cross_source: {
+        type: "object",
+        properties: {
+          agreements: { type: "array", items: { type: "string" } },
+          contradictions: { type: "array", items: { type: "string" } },
+          gaps: { type: "array", items: { type: "string" } },
+        },
+        required: ["agreements", "contradictions", "gaps"],
+      },
+    },
+    required: [
+      "what_happened",
+      "per_source",
+      "claims",
+      "story_angles",
+      "recommended_angle",
+      "reasoning",
+      "cross_source",
+    ],
+  };
+}
+
 function buildPrompt(sources: Source[]): string {
   const blocks = sources.map((source, index) => {
     const body = truncateToWords(source.text ?? "", BRIEF_SOURCE_WORDS);
@@ -84,6 +157,7 @@ export async function generateGroundedBrief(
   const brief = await generateJson(buildPrompt(ready), BriefSchema, {
     system: BRIEF_SYSTEM,
     signal: options.signal,
+    responseJsonSchema: briefResponseSchema(ready.map((source) => source.id)),
   });
   const grounded = groundBrief(brief, ready);
   const verified = grounded.claims.filter((claim) => claim.verified).length;

@@ -69,6 +69,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: err.message, retryable: false }, { status: 500 });
     }
     if (err instanceof ZodError) {
+      const issues = err.issues.map((issue) => `${issue.path.join(".") || "(root)"}:${issue.code}`);
+      console.error("[brief] schema", issues.join(", "));
       return NextResponse.json(
         { error: "The model returned a brief that failed validation.", retryable: true },
         { status: 502 }

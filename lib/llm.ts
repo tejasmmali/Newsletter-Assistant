@@ -30,6 +30,8 @@ type GenerateJsonOptions = {
   /** Optional system-style preamble prepended to the user prompt. */
   system?: string;
   signal?: AbortSignal;
+  /** Gemini response schema. Keep it small: enums, types, and array bounds. */
+  responseJsonSchema?: unknown;
 };
 
 function requireGeminiConfig(): {
@@ -96,6 +98,9 @@ async function callModel(
         responseMimeType: "application/json",
         abortSignal: options.signal,
         thinkingConfig: { thinkingBudget: 0 },
+        ...(options.responseJsonSchema
+          ? { responseJsonSchema: options.responseJsonSchema }
+          : {}),
       },
     });
     const text = response.text ?? "";
