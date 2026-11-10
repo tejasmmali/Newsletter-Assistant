@@ -1,0 +1,29 @@
+{
+  "source": "live Write page, example draft, 11 Nov 2026 Asia/Calcutta",
+  "ui_note": "Only filler phrases like \u201cin order to\u201d have a rule-based suggestion (one on this draft). Accepting several different edits needs Get AI rewrites. If that call fails, you can still accept the rule-based suggestion and reject any issue.",
+  "actions": [
+    {
+      "type": "filler",
+      "original": "in order to",
+      "suggestion": "to",
+      "status": "accepted",
+      "via": "rule",
+      "note": "Accept is enabled because a deterministic suggestion exists."
+    },
+    {
+      "type": "long-sentence",
+      "status": "rejected",
+      "via": "manual",
+      "note": "No rule suggestion. Accept stays disabled. Reject still works without an AI rewrite."
+    },
+    {
+      "type": "passive-voice",
+      "status": "left_open",
+      "note": "Accept disabled. Reject available. AI rewrite is optional."
+    }
+  ],
+  "rewrite_probe": {
+    "endpoint": "POST /api/rewrite",
+    "result": "200. Model returned the original passage unchanged, so $40 million, RLHF, reportedly, and may were kept. guard_rejected was false because nothing was stripped."
+  }
+}
