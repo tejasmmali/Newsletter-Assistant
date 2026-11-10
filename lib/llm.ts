@@ -86,7 +86,8 @@ async function callModel(
   options: GenerateJsonOptions
 ): Promise<string> {
   const started = Date.now();
-  const ai = new GoogleGenAI({ apiKey });
+  // SDK 3 defaults to API v1, which rejects responseMimeType JSON mode.
+  const ai = new GoogleGenAI({ apiKey, apiVersion: "v1beta" });
   try {
     const response = await ai.models.generateContent({
       model,
