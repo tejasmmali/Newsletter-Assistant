@@ -12,7 +12,7 @@ function Badge({
     <span
       data-slot="badge"
       className={cn(
-        "inline-flex items-center rounded-md border px-2 py-0.5 text-xs",
+        "inline-flex items-center rounded-none border px-1.5 py-0.5 font-mono text-[10px] tracking-wide uppercase",
         variant === "secondary" && "border-transparent bg-secondary text-secondary-foreground",
         variant === "outline" && "text-foreground",
         variant === "destructive" && "border-transparent bg-destructive text-white",

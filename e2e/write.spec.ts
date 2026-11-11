@@ -4,7 +4,7 @@ test("write assistant accept/reject/compare flow", async ({ page }) => {
   await page.goto("/write");
   await expect(page.getByRole("heading", { name: "Writing Assistant" })).toBeVisible();
 
-  await page.getByRole("button", { name: "Load example draft" }).click();
+  await page.getByRole("button", { name: "Load example draft" }).first().click();
   await page.getByRole("button", { name: "Analyze" }).click();
 
   await expect(page.getByText("Issues", { exact: true })).toBeVisible();
@@ -42,8 +42,8 @@ test("write assistant accept/reject/compare flow", async ({ page }) => {
     }
   }
 
-  await page.getByRole("button", { name: "Compare", exact: true }).click();
+  await page.getByRole("tab", { name: "Compare", exact: true }).click();
   await expect(page.getByText(/Original vs working draft/i)).toBeVisible();
-  await page.getByRole("button", { name: "Metrics", exact: true }).click();
+  await page.getByRole("tab", { name: "Metrics", exact: true }).click();
   await expect(page.getByText(/Rough signal only/i)).toBeVisible();
 });

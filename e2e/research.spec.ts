@@ -85,7 +85,7 @@ test("research brief renders claims and angles", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Research Assistant" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Generate brief" })).toBeEnabled();
   await page.getByRole("button", { name: "Generate brief" }).click();
-  await expect(page.getByText("Verified claim about reliability.")).toBeVisible();
+  await expect(page.getByRole("table").getByText("Verified claim about reliability.")).toBeVisible();
   await expect(page.getByText("unverified").first()).toBeVisible();
   await expect(page.getByText("Reliability over leaderboard spikes").first()).toBeVisible();
   await expect(page.getByText("Cost per successful task")).toBeVisible();
@@ -105,5 +105,5 @@ test("blocked URL shows the server message", async ({ page }) => {
   await page.goto("/research");
   await page.getByLabel("Paste URLs (one per line)").fill("http://127.0.0.1/secret");
   await page.getByRole("button", { name: "Add sources" }).click();
-  await expect(page.getByText("Blocked private or local URL (SSRF).")).toBeVisible();
+  await expect(page.getByRole("alert").filter({ hasText: "Blocked private or local URL (SSRF)." })).toBeVisible();
 });

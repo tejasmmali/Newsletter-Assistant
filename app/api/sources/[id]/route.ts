@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { ZodError, z } from "zod";
 import { updateSourceManualText } from "@/lib/ingest";
 import { SourceSchema } from "@/lib/schemas";
+import { getServiceSupabase } from "@/lib/supabase";
 
 export const runtime = "nodejs";
 
@@ -13,6 +14,20 @@ const ManualTextBodySchema = z.object({
 type RouteContext = {
   params: Promise<{ id: string }>;
 };
+
+export async function DELETE(_request: Request, context: RouteContext) {
+  const { id } = await context.params;
+  const idResult = z.string().uuid().safeParse(id);
+  if (!idResult.success) {
+    return NextResponse.json({ error: "Invalid source id." }, { status: 400 });
+  }
+  const supabase = getServiceSupabase();
+  const { error } = await supabase.from("sources").delete().eq("id", idResult.data);
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+  return NextResponse.json({ ok: true });
+}
 
 export async function PATCH(request: Request, context: RouteContext) {
   const { id } = await context.params;
