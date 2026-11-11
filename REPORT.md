@@ -58,7 +58,7 @@ Still unverified:
 
 - `POST /api/ingest` with the real bearer token. The token is a Vercel secret and was not decrypted. Without a token the route correctly returns 401.
 - The bookmarklet, for the same reason.
-- GitHub CI on the pull request had been subscribed to, and the result is recorded here only if it arrived before this file was written. Absence of a CI line means the check had not reported yet.
+- GitGuardian Security Checks completed successfully on `3711448` and on the production commit `5828afc`. The docs-only follow-up `ef166f7` had no check run yet.
 
 Rows: the four test URLs (Bernama, IPO Scoop, Finimize, VC Corner) were deleted after the production smoke test. A following `count(*)` on `public.sources` returned 0. The demo table starts empty.
 
