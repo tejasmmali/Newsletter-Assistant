@@ -531,6 +531,21 @@ export function WriteWorkspace() {
         </Alert>
       ) : null}
 
+      {analyzed ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="text-sm">Found {issues.length} issues.</p>
+          <Button type="button" size="sm" variant="outline" disabled={rewriteBusy || issues.length === 0} onClick={() => void getRewrites()}>
+            {rewriteBusy ? "Requesting…" : "Get AI rewrites"}
+          </Button>
+          <Button type="button" size="sm" variant="outline" onClick={() => setConfirmLowRisk(true)}>
+            Accept all low-risk
+          </Button>
+          <Button type="button" size="sm" variant="ghost" onClick={() => setConfirmRevert(true)}>
+            Revert all
+          </Button>
+        </div>
+      ) : null}
+
       <Tabs value={tab === "issues" ? "editor" : tab} onValueChange={(value) => setTab(value === "editor" ? "issues" : (value as Tab))}>
         <div className="flex flex-wrap items-center gap-2">
           <TabsList>
@@ -543,25 +558,8 @@ export function WriteWorkspace() {
           </Button>
         </div>
 
-        <TabsContent value="editor" className="space-y-3">
-          {analyzed ? (
-            <>
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="text-sm">Found {issues.length} issues.</p>
-                <Button type="button" size="sm" variant="outline" disabled={rewriteBusy || issues.length === 0} onClick={() => void getRewrites()}>
-                  {rewriteBusy ? "Requesting…" : "Get AI rewrites"}
-                </Button>
-                <Button type="button" size="sm" variant="outline" onClick={() => setConfirmLowRisk(true)}>
-                  Accept all low-risk
-                </Button>
-                <Button type="button" size="sm" variant="ghost" onClick={() => setConfirmRevert(true)}>
-                  Revert all
-                </Button>
-              </div>
-            </>
-          ) : (
-            <p className="text-sm text-muted-foreground">Analyze a draft to list issues.</p>
-          )}
+        <TabsContent value="editor">
+          {analyzed ? null : <p className="text-sm text-muted-foreground">Analyze a draft to list issues.</p>}
         </TabsContent>
 
         <TabsContent value="compare" className="space-y-2 font-serif text-lg leading-8">
