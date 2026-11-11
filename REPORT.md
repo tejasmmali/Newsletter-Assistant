@@ -4,13 +4,16 @@ Times below are Asia/Calcutta (UTC+5:30). The preview brief measurements are dur
 
 ## 1. Outcome
 
-Shipped to production: pending the production deploy recorded at the bottom of this file if the gates passed. The code gates did pass. Production is deployed only after the smoke test in the same change.
+Shipped to production: yes.
 
 - Pull request: https://github.com/tejasmmali/Newsletter-Assistant/pull/2
 - Production URL: https://newsletter-assistant-navy.vercel.app
+- Production deployment: `dpl_CJoKWA6p1AQq8VyWjmE8Tvuizykw` (commit `5828afc` on `main`). Ready, and the `newsletter-assistant-navy.vercel.app` alias points at it.
 - Preview deployment exercised for T1–T7: `dpl_GqjXnHF1GUtssw7boPcs477RyrJB` (commit `3711448`, branch `ui-redesign`)
 - Earlier preview on the same branch alias: `dpl_3bc3LLwsaXKUWhhScTzD8F2phtus` (commit `87d0481`)
-- Rollback target if production smoke fails: `dpl_7stwB5cD31vbhDxj1ymyAidbbpEz` (the previous good production deployment, commit `c4944b6`)
+- Rollback target, not used: `dpl_7stwB5cD31vbhDxj1ymyAidbbpEz` (previous production deployment, commit `c4944b6`)
+
+Production smoke on the navy alias: `/research` and `/write` returned 200 and rendered the new headings. `POST /api/ingest` with no token returned 401. `POST /api/brief` returned 200 in 10.9 seconds (`latency_ms` 9563, 3 sources, 12 claims, 8 verified, 4 unverified, 3 angles). `POST /api/rewrite` returned 200 in 1.0 second with `guard_rejected: true` and the original sentence kept, including `$40 million`, `reportedly`, `may`, `RLHF`, `OpenAI`, `12%`, and `2026`.
 
 ## 2. Tests
 
@@ -57,7 +60,7 @@ Still unverified:
 - The bookmarklet, for the same reason.
 - GitHub CI on the pull request had been subscribed to, and the result is recorded here only if it arrived before this file was written. Absence of a CI line means the check had not reported yet.
 
-Rows: the timed brief used one Ready row each for Bernama, IPO Scoop, and Finimize, plus the VC Corner Needs-text row. Those four rows are deleted after the production smoke test so the demo table starts empty. The cleanup result is appended at the bottom of this file.
+Rows: the four test URLs (Bernama, IPO Scoop, Finimize, VC Corner) were deleted after the production smoke test. A following `count(*)` on `public.sources` returned 0. The demo table starts empty.
 
 ## 5. Morning TODO (only you can do these)
 
