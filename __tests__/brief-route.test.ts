@@ -86,6 +86,28 @@ describe("POST /api/brief", () => {
     vi.useRealTimers();
   });
 
+  it("hides Gemini's schema-size error behind a short retry", async () => {
+    mockedList.mockResolvedValue(ready);
+    mockedGenerate.mockRejectedValue(
+      new Error(
+        '{"error":{"code":400,"message":"The specified schema produces a constraint that has too many states for serving.","status":"INVALID_ARGUMENT"}}'
+      )
+    );
+    const res = await POST(
+      new Request("http://localhost/api/brief", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "{}",
+      })
+    );
+    expect(res.status).toBe(502);
+    const json = (await res.json()) as { error?: string; retryable?: boolean };
+    expect(json).toEqual({
+      error: "The model rejected the brief request. Retry.",
+      retryable: true,
+    });
+  });
+
   it("maps rate limits to 429", async () => {
     mockedList.mockResolvedValue(ready);
     mockedGenerate.mockRejectedValue(new LlmRateLimitError());
