@@ -56,31 +56,32 @@ Hard rules:
 - Tag IPO timing and valuation targets as speculation, not fact.
 - Return JSON only matching the schema.`;
 
-/** Constrains Gemini JSON mode to the brief shape and the real source ids. */
-export function briefResponseSchema(sourceIds: string[]) {
-  const sourceId = { type: "string", enum: sourceIds };
+/**
+ * Shape Gemini must return. No array min/max and no source-id enums:
+ * those make constrained decoding report "too many states for serving".
+ * BriefSchema still enforces the claim cap, angle count, and uuid source ids.
+ */
+export function briefResponseSchema() {
+  const sourceId = { type: "string" };
   return {
     type: "object",
     properties: {
       what_happened: { type: "string" },
       per_source: {
         type: "array",
-        minItems: 1,
         items: {
           type: "object",
           properties: {
             source_id: sourceId,
             summary: { type: "string" },
             why_it_matters: { type: "string" },
-            who_should_care: { type: "array", minItems: 1, maxItems: 4, items: { type: "string" } },
+            who_should_care: { type: "array", items: { type: "string" } },
           },
           required: ["source_id", "summary", "why_it_matters", "who_should_care"],
         },
       },
       claims: {
         type: "array",
-        minItems: 1,
-        maxItems: MAX_BRIEF_CLAIMS,
         items: {
           type: "object",
           properties: {
@@ -94,8 +95,6 @@ export function briefResponseSchema(sourceIds: string[]) {
       },
       story_angles: {
         type: "array",
-        minItems: MIN_STORY_ANGLES,
-        maxItems: MAX_STORY_ANGLES,
         items: {
           type: "object",
           properties: {
@@ -157,7 +156,7 @@ export async function generateGroundedBrief(
   const brief = await generateJson(buildPrompt(ready), BriefSchema, {
     system: BRIEF_SYSTEM,
     signal: options.signal,
-    responseJsonSchema: briefResponseSchema(ready.map((source) => source.id)),
+    responseJsonSchema: briefResponseSchema(),
   });
   const grounded = groundBrief(brief, ready);
   const verified = grounded.claims.filter((claim) => claim.verified).length;

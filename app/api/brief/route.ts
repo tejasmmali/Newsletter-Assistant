@@ -78,6 +78,12 @@ export async function POST(request: Request) {
     }
     const message = err instanceof Error ? err.message : "Brief generation failed";
     console.error("[brief]", message);
+    if (/too many states for serving|INVALID_ARGUMENT/.test(message)) {
+      return NextResponse.json(
+        { error: "The model rejected the brief request. Retry.", retryable: true },
+        { status: 502 }
+      );
+    }
     return NextResponse.json({ error: message, retryable: true }, { status: 500 });
   } finally {
     clearTimeout(timer);

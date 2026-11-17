@@ -2,19 +2,21 @@ import { describe, expect, it } from "vitest";
 import { briefResponseSchema } from "@/lib/brief";
 
 describe("briefResponseSchema", () => {
-  it("limits claims and angles and only allows the given source ids", () => {
-    const schema = briefResponseSchema([
-      "11111111-1111-4111-8111-111111111111",
-      "22222222-2222-4222-8222-222222222222",
+  it("omits the constraints Gemini rejects as too many states", () => {
+    const schema = briefResponseSchema();
+    const encoded = JSON.stringify(schema);
+
+    expect(encoded).not.toContain("minItems");
+    expect(encoded).not.toContain("maxItems");
+    expect(encoded).not.toMatch(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/);
+
+    expect(schema.properties.claims.items.properties.type.enum).toEqual([
+      "fact",
+      "analysis",
+      "speculation",
     ]);
-    const claims = schema.properties.claims;
-    const angles = schema.properties.story_angles;
-    expect(claims.maxItems).toBe(12);
-    expect(angles.minItems).toBe(2);
-    expect(angles.maxItems).toBe(3);
-    expect(claims.items.properties.source_id.enum).toEqual([
-      "11111111-1111-4111-8111-111111111111",
-      "22222222-2222-4222-8222-222222222222",
-    ]);
+    expect(schema.properties.claims.items.properties.source_id).toEqual({ type: "string" });
+    expect(schema.properties.per_source.items.properties.source_id).toEqual({ type: "string" });
+    expect(schema.required).toContain("cross_source");
   });
 });
